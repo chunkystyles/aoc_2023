@@ -28,6 +28,26 @@ async function part1() {
     return total;
 }
 
+async function part2() {
+    const input = await getInput(2);
+    const games = parseInput(input);
+    let total = 0;
+    games.forEach(game => {
+        let minimums = {
+            "red": 0,
+            "green": 0,
+            "blue": 0
+        }
+        game.rounds.forEach(round => {
+            for (const [key, value] of Object.entries(round)) {
+                minimums[key] = Math.max(round[key], minimums[key]);
+            }
+        });
+        total += (minimums.red * minimums.green * minimums.blue);
+    });
+    return total;
+}
+
 function parseInput(input) {
     let games = [];
     input.split('\n').forEach(line => {
@@ -51,4 +71,4 @@ function parseInput(input) {
     return games;
 }
 
-part1().then(result => console.log(result));
+part2().then(result => console.log(result));
