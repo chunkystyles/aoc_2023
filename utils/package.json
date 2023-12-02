@@ -9,5 +9,7 @@
   "author": "",
   "license": "ISC",
   "type": "module",
-  "dependencies": { }
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
 }
