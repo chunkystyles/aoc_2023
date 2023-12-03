@@ -39,6 +39,65 @@ async function part1() {
     return total;
 }
 
+async function part2() {
+    const input = await getInput(3);
+    const schematic = parseInput(input);
+    let total = 0;
+    for (let i = 0; i < schematic.length; i++) {
+        for (let j = 0; j < schematic[i].length; j++) {
+            if (isGearSymbol(schematic[i][j])) {
+                const numbers = getNumbers(schematic, i, j);
+                if (numbers.length === 2) {
+                    total += numbers[0].value * numbers[1].value;
+                }
+            }
+        }
+    }
+    return total;
+}
+
+function getNumbers(schematic, rowIndex, columnIndex) {
+    let numbers = [];
+    for (let i = -1; i <= 1; i++) {
+        const newRow = rowIndex + i;
+        if (newRow >= 0 && newRow < schematic.length) {
+            for (let j = -1; j <= 1; j++) {
+                if (!(i === 0 && j === 0)) { // No need to check the character itself
+                    const newColumn = columnIndex + j;
+                    if (numbers.length > 0 && numbers[numbers.length - 1].row === newRow && numbers[numbers.length - 1].right >= newColumn) {
+                        continue;
+                    }
+                    if (newColumn >= 0 && newColumn < schematic[newRow].length) {
+                        if (isDigit(schematic[newRow][newColumn])) {
+                            if (numbers.length === 2) {
+                                return [];
+                            }
+                            numbers.push(getNumberFromStartPoint(schematic, newRow, newColumn));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return numbers;
+}
+
+function getNumberFromStartPoint(schematic, row, column) {
+    let left = column;
+    let right = column;
+    while (left - 1 >= 0 && isDigit(schematic[row][left - 1])) {
+        left--;
+    }
+    while (right + 1 < schematic[row].length && isDigit(schematic[row][right + 1])) {
+        right++;
+    }
+    return {
+        right: right,
+        row: row,
+        value: Number(schematic[row].slice(left, right + 1).join(''))
+    }
+}
+
 function checkAdjacency(schematic, rowIndex, columnIndex) {
     for (let i = -1; i <= 1; i++) {
         const newRow = rowIndex + i;
@@ -70,4 +129,8 @@ function isSymbol(char) {
     return char !== '.' && !isDigit(char);
 }
 
-part1().then(result => console.log(result));
+function isGearSymbol(char) {
+    return char ===  '*';
+}
+
+part2().then(result => console.log(result));
