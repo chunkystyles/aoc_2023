@@ -11,6 +11,19 @@ async function part1() {
     return total;
 }
 
+async function part2() {
+    const race = parseInput2(await getInput(6));
+    const time = race.time;
+    const distance = race.distance;
+    let wins = 0;
+    for (let holdTime = 0; holdTime <= time; holdTime++) {
+        if (holdTime * (time - holdTime) > distance) {
+            wins++;
+        }
+    }
+    return wins;
+}
+
 function getMaxTime(races) {
     return races.map(race => race.time).sort(compareNumbers)[races.length - 1];
 }
@@ -51,4 +64,13 @@ function parseInput(input) {
     return races;
 }
 
-part1().then(result => console.log(result));
+function parseInput2(input) {
+    input = input.replaceAll(' ', '');
+    const lines = input.split('\n');
+    return {
+        time: Number(lines[0].split(':')[1]),
+        distance: Number(lines[1].split(':')[1])
+    }
+}
+
+part2().then(result => console.log(result));
