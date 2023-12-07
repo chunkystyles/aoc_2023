@@ -1,6 +1,15 @@
-import { getInput } from '../utils/utils.js'
+import { getInput, writeJsonFile } from '../utils/utils.js'
 
 async function part1() {
+    const hands = parseInput(await getInput(7)).sort(compareHands);
+    let total = 0;
+    for (let i = 0; i < hands.length; i++) {
+        total += (i + 1) * hands[i].bid;
+    }
+    return total;
+}
+
+async function part2() {
     const hands = parseInput(await getInput(7)).sort(compareHands);
     let total = 0;
     for (let i = 0; i < hands.length; i++) {
@@ -24,15 +33,34 @@ function parseInput(input) {
                     counts.set(card, 1);
                 }
             });
-            const countsArray = Array.from(counts, ([key, value]) => (value)).sort(compareNumbers).reverse();
+            const countsArray = Array.from(counts, ([key, value]) => ({card:key, count:value})).sort(compareCardCount).reverse();
+            const converted = convertJokers(countsArray, cards);
             hands.push({
                 cards: cards,
                 bid: bid,
-                tier: getHandTier(countsArray)
-            })
+                tier: getHandTier(converted)
+            });
         }
     });
-    return hands;
+    return hands
+}
+
+function convertJokers(countsArray, cards) {
+    let jokers = cards.filter(card => card === 1).length;
+    if (jokers > 0) {
+        let index;
+        for (let i = 0; i < countsArray.length; i++) {
+            if (countsArray[i].card === 1) {
+                index = i;
+                break;
+            }
+        }
+        if (countsArray.length > 1) {
+            countsArray.splice(index, 1);
+            countsArray[0].count += jokers;
+        }
+    }
+    return countsArray;
 }
 
 function mapCardToNumber(card) {
@@ -41,7 +69,7 @@ function mapCardToNumber(card) {
     } else if (card === 'T') {
         return 10;
     } else if (card === 'J') {
-        return 11;
+        return 1;
     } else if (card === 'Q') {
         return 12;
     } else if (card === 'K') {
@@ -52,18 +80,18 @@ function mapCardToNumber(card) {
 }
 
 function getHandTier(counts) {
-    if (counts[0] === 5) {
+    if (counts[0].count === 5) {
         return 6;
-    } else if (counts[0] === 4) {
+    } else if (counts[0].count === 4) {
         return 5;
-    } else if (counts[0] === 3) {
-        if (counts[1] ===  2) {
+    } else if (counts[0].count === 3) {
+        if (counts[1].count ===  2) {
             return 4;
         } else {
             return 3;
         }
-    } else if (counts[0] === 2) {
-        if (counts[1] === 2) {
+    } else if (counts[0].count === 2) {
+        if (counts[1].count === 2) {
             return 2;
         } else {
             return 1;
@@ -98,4 +126,8 @@ function compareNumbers(a, b) {
     }
 }
 
-part1().then(result => console.log(result));
+function compareCardCount(a, b) {
+    return compareNumbers(a.count, b.count);
+}
+
+part2().then(result => console.log(result));

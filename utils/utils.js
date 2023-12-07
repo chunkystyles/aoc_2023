@@ -16,3 +16,7 @@ export async function getInput(day) {
         console.error(inputResponse.status, inputResponse.statusText);
     }
 }
+
+export async function writeJsonFile(jsonObject, file) {
+    fs.writeFileSync(file, JSON.stringify(jsonObject));
+}
