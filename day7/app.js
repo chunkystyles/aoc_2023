@@ -42,7 +42,7 @@ function parseInput(input) {
             });
         }
     });
-    return hands
+    return hands;
 }
 
 function convertJokers(countsArray, cards) {
