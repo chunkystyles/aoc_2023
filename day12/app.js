@@ -20,7 +20,7 @@ async function part1() {
     // const conditions = parseInput(await getInput(12));
     for (const condition of conditions) {
         arrangements = 0;
-        const expand = true;
+        const expand = false;
         map = new Map();
         if (expand) {
             springs = expandSprings(condition.springs, 5);
@@ -94,12 +94,12 @@ function isConditionSuitable(condition) {
         if (map.has(firstCondition)) {
             myCount += map.get(firstCondition);
         } else {
-            myCount += isConditionSuitable(firstCondition, springs, springsLength);
+            myCount += isConditionSuitable(firstCondition);
         }
         if (map.has(secondCondition)) {
             myCount += map.get(secondCondition);
         } else {
-            myCount += isConditionSuitable(secondCondition, springs, springsLength);
+            myCount += isConditionSuitable(secondCondition);
         }
         map.set(condition, myCount);
         return myCount;
