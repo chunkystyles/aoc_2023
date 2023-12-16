@@ -2,21 +2,51 @@ import {getInput, stringify2dArray} from '../utils/utils.js'
 import {Queue} from '@datastructures-js/queue';
 
 let map;
-let energies = [];
+let energies;
 const energized = '#';
 const beams = new Queue();
-const cache = new Set();
+let cache;
 let start;
+let max = 0;
 
 async function part1() {
     map = parseInput(await getInput(16));
-    for (const row of map) {
-        energies.push([]);
-        for (const char of row) {
-            energies[energies.length - 1].push('.');
+    const total = shineBeam({x: -1, y: 0, direction: 'east'});
+    const end = new Date().getTime();
+    console.log(`${end - start} ms`);
+    return total;
+}
+
+async function part2() {
+    map = parseInput(await getInput(16));
+    for (let y = 0; y < map.length; y++) {
+        let value = shineBeam({x: -1, y: y, direction: 'east'});
+        if (value > max) {
+            max = value;
+        }
+        value = shineBeam({x: map[0].length, y: y, direction: 'west'});
+        if (value > max) {
+            max = value;
         }
     }
-    addBeam({x: -1, y: 0, direction: 'east'});
+    for (let x = 0; x < map[0].length; x++) {
+        let value = shineBeam({x: x, y: -1, direction: 'south'});
+        if (value > max) {
+            max = value;
+        }
+        value = shineBeam({x: x, y: map.length, direction: 'north'});
+        if (value > max) {
+            max = value;
+        }
+    }
+    const end = new Date().getTime();
+    console.log(`${end - start} ms`);
+    return max;
+}
+
+function shineBeam(beam) {
+    reset();
+    addBeam(beam);
     while (beams.size() > 0) {
         let beam = beams.dequeue();
         let nextPoint;
@@ -111,10 +141,7 @@ async function part1() {
             }
         }
     }
-    const total = calculateEnergies();
-    const end = new Date().getTime();
-    console.log(`${end - start} ms`);
-    return total;
+    return calculateEnergies();
 }
 
 function getNextPoint(beam) {
@@ -163,4 +190,23 @@ function createKey(beam) {
     return `${beam.y}-${beam.x}-${beam.direction}`;
 }
 
-part1().then(result => console.log(result));
+function reset() {
+    if (!energies) {
+        energies = [];
+        for (const row of map) {
+            energies.push([]);
+            for (const char of row) {
+                energies[energies.length - 1].push('.');
+            }
+        }
+    } else {
+        for (let y = 0; y < energies.length; y++) {
+            for (let x = 0; x < energies[y].length; x++) {
+                energies[y][x] = '.';
+            }
+        }
+    }
+    cache = new Set();
+}
+
+part2().then(result => console.log(result));
