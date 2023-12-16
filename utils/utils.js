@@ -20,3 +20,7 @@ export async function getInput(day) {
 export async function writeJsonFile(jsonObject, file) {
     fs.writeFileSync(file, JSON.stringify(jsonObject));
 }
+
+export function stringify2dArray(array) {
+    return array.map(line => line.join('')).join('\n');
+}
